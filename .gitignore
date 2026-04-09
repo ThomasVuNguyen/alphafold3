@@ -1,0 +1,21 @@
+# Model weights (large binary files, obtained under license)
+models/
+*.bin.zst
+
+# Modal artifacts
+modal_af3.py
+
+# Inference outputs
+af3_output/
+final_predictions/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+
+# Test inputs
+test_input.json
+real_test.json
+mthfr_test.json
