@@ -1,0 +1,722 @@
+/* ============================================================
+   AlphaFold3 Visualizer — Dense Scientific Tool Design
+   Matching AlphaGenome Tinker aesthetic
+   ============================================================ */
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #0a0a0a;
+  color: #e5e5e5;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Mono numerals for scientific data */
+.tabular { font-variant-numeric: tabular-nums; }
+.mono { font-family: ui-monospace, "Cascadia Code", "JetBrains Mono", monospace; }
+
+/* ============================================================
+   3-Panel Layout
+   ============================================================ */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Left panel — prediction selector & config */
+.panel-left {
+  width: 280px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-right: 1px solid #262626;
+  background: #0f0f0f;
+  overflow-y: auto;
+}
+
+/* Center panel — visualizations */
+.panel-center {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Right panel — metadata sidebar */
+.panel-right {
+  width: 264px;
+  min-width: 264px;
+  border-left: 1px solid #262626;
+  background: #0f0f0f;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   Section Headers — AlphaGenome style
+   ============================================================ */
+.section-header {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #737373;
+  padding: 12px 16px 6px;
+}
+
+.section-header-flush {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #737373;
+  margin-bottom: 6px;
+}
+
+/* ============================================================
+   Left Panel — Predictions List
+   ============================================================ */
+.panel-brand {
+  padding: 14px 16px;
+  border-bottom: 1px solid #262626;
+}
+
+.panel-brand h1 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e5e5e5;
+  margin: 0;
+}
+
+.panel-brand .subtitle {
+  font-size: 11px;
+  color: #525252;
+  margin-top: 2px;
+}
+
+.pred-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.pred-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #1a1a1a;
+  transition: background 120ms;
+}
+
+.pred-item:hover {
+  background: #171717;
+}
+
+.pred-item.active {
+  background: #1a1a1a;
+  border-left: 2px solid #10b981;
+}
+
+.pred-item .pred-name {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: #d4d4d4;
+}
+
+.pred-item.active .pred-name {
+  color: #10b981;
+}
+
+.pred-item .pred-score-mini {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: #525252;
+}
+
+.pred-item .pred-score-mini span {
+  color: #737373;
+}
+
+/* ============================================================
+   Sample Tabs — inside left panel
+   ============================================================ */
+.sample-section {
+  padding: 0 16px 12px;
+}
+
+.sample-tabs-compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.sample-tab-sm {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+  color: #525252;
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.sample-tab-sm:hover {
+  color: #a3a3a3;
+  background: #171717;
+}
+
+.sample-tab-sm.active {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+/* ============================================================
+   Quick Metrics Row — inside left panel
+   ============================================================ */
+.quick-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #1a1a1a;
+  border-top: 1px solid #262626;
+  border-bottom: 1px solid #262626;
+}
+
+.quick-metric {
+  background: #0f0f0f;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.quick-metric .qm-value {
+  font-family: ui-monospace, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #e5e5e5;
+}
+
+.quick-metric .qm-value.good { color: #10b981; }
+.quick-metric .qm-value.mid { color: #eab308; }
+.quick-metric .qm-value.low { color: #ef4444; }
+
+.quick-metric .qm-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #525252;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   Visualization Sections — Center Panel
+   ============================================================ */
+.viz-section {
+  border: 1px solid #262626;
+  border-radius: 8px;
+  background: #0f0f0f;
+  overflow: hidden;
+}
+
+.viz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.viz-header h3 {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: #d4d4d4;
+  margin: 0;
+}
+
+.viz-header .viz-meta {
+  font-size: 11px;
+  color: #525252;
+}
+
+.viz-body {
+  padding: 12px 14px;
+}
+
+.viz-body-flush {
+  padding: 0;
+}
+
+/* ============================================================
+   3D Structure Viewer
+   ============================================================ */
+.structure-viewer {
+  width: 100%;
+  height: 420px;
+  background: #000;
+  position: relative;
+}
+
+.structure-viewer canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.plddt-legend {
+  display: flex;
+  gap: 14px;
+  padding: 8px 14px;
+  border-top: 1px solid #1a1a1a;
+}
+
+.legend-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #737373;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* ============================================================
+   pLDDT Canvas Strip
+   ============================================================ */
+.plddt-strip-row {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 4px 14px;
+}
+
+.plddt-strip-label {
+  font-size: 11px;
+  color: #a3a3a3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plddt-strip-label .strip-sub {
+  display: block;
+  font-size: 9px;
+  color: #525252;
+}
+
+/* ============================================================
+   PAE Heatmap
+   ============================================================ */
+.pae-container {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.pae-canvas-wrap {
+  position: relative;
+}
+
+.pae-canvas-wrap canvas {
+  image-rendering: pixelated;
+  border-radius: 4px;
+}
+
+.pae-axis-label {
+  font-size: 10px;
+  color: #525252;
+}
+
+.pae-colorbar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.pae-colorbar .cb-gradient {
+  width: 12px;
+  height: 200px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0b5394, #1a9988, #7cc47c, #f5d742, #e74c3c);
+}
+
+.pae-colorbar .cb-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 200px;
+  font-size: 9px;
+  color: #525252;
+  font-family: ui-monospace, monospace;
+}
+
+/* ============================================================
+   Ranking Scores — bar chart
+   ============================================================ */
+.ranking-bars {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  height: 80px;
+  padding: 0 4px;
+}
+
+.ranking-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.ranking-bar {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  min-height: 2px;
+  transition: background 150ms;
+}
+
+.ranking-bar.best {
+  background: #10b981;
+}
+
+.ranking-bar.normal {
+  background: rgba(16, 185, 129, 0.35);
+}
+
+.ranking-bar-label {
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  color: #525252;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ranking-bar-value {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: #a3a3a3;
+}
+
+/* ============================================================
+   Right Panel — Metadata
+   ============================================================ */
+.meta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 3px 0;
+}
+
+.meta-row .meta-key {
+  color: #525252;
+}
+
+.meta-row .meta-val {
+  font-family: ui-monospace, monospace;
+  color: #d4d4d4;
+  font-size: 11px;
+}
+
+.meta-row .meta-val.good { color: #10b981; }
+.meta-row .meta-val.mid { color: #eab308; }
+.meta-row .meta-val.low { color: #ef4444; }
+
+/* File list */
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.file-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  background: #171717;
+}
+
+.file-row .fname {
+  color: #10b981;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+
+.file-row .fsize {
+  color: #525252;
+  flex-shrink: 0;
+}
+
+/* Pipeline badges */
+.pipeline-inline {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pipe-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.pipe-badge.done {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.pipe-badge.pending {
+  background: #171717;
+  color: #525252;
+  border: 1px solid #262626;
+}
+
+/* ============================================================
+   New Prediction Section (bottom of left panel)
+   ============================================================ */
+.new-pred-section {
+  margin-top: auto;
+  padding: 12px 16px;
+  border-top: 1px solid #262626;
+}
+
+/* Example presets */
+.example-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.example-label {
+  font-size: 10px;
+  color: #525252;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.example-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #262626;
+  background: #141414;
+  cursor: pointer;
+  transition: border-color 150ms, background 150ms;
+  text-align: left;
+}
+
+.example-chip:hover {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.example-chip-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #d4d4d4;
+  white-space: nowrap;
+}
+
+.example-chip-desc {
+  font-size: 9px;
+  color: #525252;
+  font-family: ui-monospace, monospace;
+  white-space: nowrap;
+}
+
+.input-mini {
+  width: 100%;
+  background: #171717;
+  border: 1px solid #262626;
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: #10b981;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  transition: border-color 150ms;
+}
+
+.input-mini:focus {
+  border-color: #10b981;
+}
+
+.btn-run {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  background: #10b981;
+  color: #000;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.btn-run:hover {
+  background: #34d399;
+}
+
+.btn-run:disabled {
+  background: #262626;
+  color: #525252;
+  cursor: default;
+}
+
+/* ============================================================
+   Empty / Loading / Error States
+   ============================================================ */
+.state-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #525252;
+  font-size: 13px;
+  border: 1px dashed #262626;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.state-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: #737373;
+  font-size: 13px;
+}
+
+.state-error {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.05);
+  color: #fca5a5;
+  font-size: 13px;
+  font-family: ui-monospace, monospace;
+  padding: 10px 14px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+}
+
+.spin-dot {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #262626;
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   Security badge
+   ============================================================ */
+.security-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 10px;
+  color: #525252;
+  border-top: 1px solid #1a1a1a;
+}
+
+.security-badge .lock-icon {
+  font-size: 12px;
+}
+
+/* ============================================================
+   Scrollbar styling
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #404040;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 1100px) {
+  .panel-right {
+    display: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .panel-left {
+    width: 200px;
+    min-width: 200px;
+  }
+}
